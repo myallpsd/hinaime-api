@@ -1,0 +1,6 @@
+# Normalize line endings to LF in the repo and avoid CRLF surprises
+* text=auto
+src/** text eol=lf
+wrangler.toml text eol=lf
+index.js text eol=lf
+api/** text eol=lf

@@ -48,7 +48,8 @@ const config = {
 
   isProduction: getEnv('NODE_ENV', 'production') === 'production',
   isDevelopment: getEnv('NODE_ENV', '') === 'development',
-  isCloudflare: true,
+  // Detect Cloudflare Workers environment via injected global
+  isCloudflare: (typeof globalThis !== 'undefined' && typeof globalThis.CLOUDFLARE_ENV !== 'undefined'),
 };
 
 export default config;
