@@ -1,4 +1,9 @@
 import config from '../config/config.js';
+import filterOptions from './filter.js';
+
+// helper to normalize the option presentation
+const present = (arr) => (Array.isArray(arr) ? arr.map((x) => ({ value: x.value, key: x.key, label: x.label })) : []);
+const currentYear = new Date().getFullYear();
 
 const apiDocumentation = {
   generalInfo: {
@@ -405,11 +410,14 @@ const apiDocumentation = {
       endpoint: '/filter',
       hasParams: false,
       hasQueries: true,
-      queriesList: ['keyword', 'type', 'status', 'rated', 'score', 'season', 'language', 'start_date', 'end_date', 'sort', 'genres', 'page'],
+      // date parts are passed as sy/sm/sd and ey/em/ed (year, month, day)
+      queriesList: ['keyword', 'type', 'status', 'rated', 'score', 'season', 'language', 'sy', 'sm', 'sd', 'ey', 'em', 'ed', 'sort', 'genres', 'page'],
       defaultQueries: { page: 1 },
-      example: '/filter?type=tv&status=finished-airing&rated=r&score=good&season=fall&language=sub&sort=most-popular&genres=action,adventure&page=1',
-      description: 'Filters anime based on multiple criteria.',
+      // Example uses site-native values: numeric selects for types/languages, date parts (sy/sm/sd, ey/em/ed), sort as site value, and genres as numeric ids
+      example: '/filter?type=2&status=1&rated=3&score=1&season=1&language=2&sy=2008&sm=12&sd=19&ey=2026&em=1&ed=1&sort=released_date&genres=1&page=1',
+      description: 'Filters anime based on multiple criteria. Accepts site-format parameters (numeric select values for options, date parts sy/sm/sd and ey/em/ed, `genres` as numeric ids or comma-separated keys, and `sort` as site values or keys).',
     },
+
     {
       name: 'filter options',
       endpoint: '/filter/options',
@@ -417,6 +425,21 @@ const apiDocumentation = {
       hasQueries: false,
       example: '/filter/options',
       description: 'Returns all available filter options (types, statuses, ratings, scores, seasons, languages, sorts, genres).',
+      options: {
+        type: present(filterOptions.type),
+        status: present(filterOptions.status),
+        rated: present(filterOptions.rated),
+        score: present(filterOptions.score),
+        season: present(filterOptions.season),
+        language: present(filterOptions.language),
+        sort: present(filterOptions.sort),
+        genres: present(filterOptions.genres),
+        dateParts: {
+          sy: { min: 1917, max: currentYear, note: 'Year (1917 - current year)' },
+          sm: { min: 1, max: 12, note: 'Month (1-12)' },
+          sd: { min: 1, max: 31, note: 'Day (1-31)' },
+        },
+      },
     },
     {
       name: 'genres',

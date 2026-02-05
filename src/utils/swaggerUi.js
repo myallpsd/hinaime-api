@@ -1,4 +1,50 @@
 import config from '../config/config.js';
+import filterOptions from './filter.js';
+
+// Build filter parameters dynamically from filterOptions
+const optionEnum = (arr) => (Array.isArray(arr) ? [...new Set([...(arr.map((x) => String(x.value))), ...(arr.map((x) => String(x.key || '')))])].filter(Boolean) : []);
+const presentEnum = (arr) => (Array.isArray(arr) ? arr.map((x) => String(x.value)) : []);
+const present = (arr) => (Array.isArray(arr) ? arr.map((x) => ({ value: x.value, key: x.key, label: x.label })) : []);
+
+const filterParameters = [
+  { name: 'keyword', in: 'query', schema: { type: 'string' } },
+  { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+  {
+    name: 'genres',
+    in: 'query',
+    required: false,
+    schema: {
+      type: 'string',
+      // accepts comma-separated keys (e.g., 'action') or numeric ids (e.g., '1')
+      enum: optionEnum(filterOptions.genres),
+    },
+    description: 'Comma-separated list of genres (either numeric ids or keys).',
+  },
+  ...['type','status','rated','score','season','language'].map((k) => ({
+    name: k,
+    in: 'query',
+    required: false,
+    schema: { type: 'string', enum: optionEnum(filterOptions[k]) },
+    description: `Accepts site select values or keys for ${k}.`,
+  })),
+  // date parts (sy/sm/sd and ey/em/ed)
+  { name: 'sy', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.sy) }, description: 'Start year (YYYY) - use site select values' },
+  { name: 'sm', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.sm) }, description: 'Start month (1-12)' },
+  { name: 'sd', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.sd) }, description: 'Start day (1-31)' },
+  { name: 'ey', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.ey) }, description: 'End year (YYYY) - use site select values' },
+  { name: 'em', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.em) }, description: 'End month (1-12)' },
+  { name: 'ed', in: 'query', schema: { type: 'string', enum: presentEnum(filterOptions.ed) }, description: 'End day (1-31)' },
+  // sort accepts site values and keys
+  {
+    name: 'sort',
+    in: 'query',
+    schema: {
+      type: 'string',
+      enum: optionEnum(filterOptions.sort),
+    },
+    description: 'Sort by site value or key (e.g., released_date or release_date).',
+  },
+];
 
 const hianimeApiDocs = {
   openapi: '3.0.0',
@@ -273,116 +319,7 @@ const hianimeApiDocs = {
     '/filter': {
       get: {
         summary: 'Filter anime',
-        parameters: [
-          { name: 'keyword', in: 'query', schema: { type: 'string' } },
-          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-
-          {
-            name: 'genres',
-            in: 'query',
-            required: false,
-            schema: {
-              type: 'string',
-              enum: [
-                'action',
-                'adventure',
-                'cars',
-                'comedy',
-                'dementia',
-                'demons',
-                'mystery',
-                'drama',
-                'ecchi',
-                'fantasy',
-                'game',
-                'historical',
-                'horror',
-                'kids',
-                'magic',
-                'martial_arts',
-                'mecha',
-                'music',
-                'parody',
-                'samurai',
-                'romance',
-                'school',
-                'sci-fi',
-                'shoujo',
-                'shoujo_ai',
-                'shounen',
-                'shounen_ai',
-                'space',
-                'sports',
-                'super_power',
-                'vampire',
-                'harem',
-                'slice_of_life',
-                'supernatural',
-                'military',
-                'police',
-                'psychological',
-                'thriller',
-                'seinen',
-                'josei',
-                'isekai',
-              ],
-            },
-          },
-          {
-            name: 'type',
-            in: 'query',
-            required: false,
-            schema: { type: 'string', enum: ['all', 'movie', 'tv', 'ova', 'special', 'music'] },
-          },
-          {
-            name: 'status',
-            in: 'query',
-            required: false,
-            schema: {
-              type: 'string',
-              enum: ['all', 'finished_airing', 'currently_airing', 'not_yet_aired'],
-            },
-          },
-          {
-            name: 'rated',
-            in: 'query',
-            required: false,
-            schema: { type: 'string', enum: ['all', 'g', 'pg', 'pg-13', 'r', 'r+', 'rx'] },
-          },
-          {
-            name: 'score',
-            in: 'query',
-            required: false,
-            schema: {
-              type: 'string',
-              enum: [
-                'all',
-                'appalling',
-                'horrible',
-                'very_bad',
-                'bad',
-                'average',
-                'fine',
-                'good',
-                'very_good',
-                'great',
-                'masterpiece',
-              ],
-            },
-          },
-          {
-            name: 'season',
-            in: 'query',
-            required: false,
-            schema: { type: 'string', enum: ['all', 'spring', 'summer', 'fall', 'winter'] },
-          },
-          {
-            name: 'language',
-            in: 'query',
-            required: false,
-            schema: { type: 'string', enum: ['all', 'sub', 'dub', 'sub_dub'] },
-          },
-        ],
+        parameters: filterParameters,
         responses: { 200: { description: 'Success' } },
       },
     },
@@ -459,7 +396,33 @@ const hianimeApiDocs = {
       get: {
         summary: 'Get filter options',
         description: 'Returns available filter options for anime search',
-        responses: { 200: { description: 'Success' } },
+        responses: {
+          200: {
+            description: 'Success',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                },
+                example: {
+                  type: present(filterOptions.type),
+                  status: present(filterOptions.status),
+                  rated: present(filterOptions.rated),
+                  score: present(filterOptions.score),
+                  season: present(filterOptions.season),
+                  language: present(filterOptions.language),
+                  sort: present(filterOptions.sort),
+                  genres: present(filterOptions.genres),
+                  dateParts: {
+                    sy: { min: 1917, max: new Date().getFullYear() },
+                    sm: { min: 1, max: 12 },
+                    sd: { min: 1, max: 31 },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     '/genres': {
