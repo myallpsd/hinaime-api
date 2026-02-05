@@ -11,7 +11,7 @@ const getEnv = (key, defaultValue = '') => {
 const config = {
   baseurl: getEnv('HIANIME_BASE_URL', 'https://hianime.to'),
   baseurl_v2: getEnv('HIANIME_BASE_URL_V2', 'https://aniwatchtv.to'),
-  baseUrl: getEnv('BASE_URL', 'https://hianime-api.myallpsd.workers.dev'),
+  baseUrl: getEnv('BASE_URL', 'https://hinaime-api.vercel.app'),
   origin: getEnv('ORIGIN', '*'),
   port: parseInt(getEnv('PORT', '5000')),
 
