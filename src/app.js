@@ -54,18 +54,22 @@ app.use('*', async (c, next) => {
   }
 
   if (isVercelEnabled && config.vercel.analytics.serverEvents && c.req.path.startsWith('/api')) {
-    const durationMs = Date.now() - start;
-    const payload = {
-      method: c.req.method,
-      path: c.req.path,
-      status: c.res.status,
-      duration_ms: durationMs,
-    };
-    const work = track('api_request', payload);
-    if (c.executionCtx?.waitUntil) {
-      c.executionCtx.waitUntil(work);
-    } else {
-      void work;
+    try {
+      const durationMs = Date.now() - start;
+      const payload = {
+        method: c.req.method,
+        path: c.req.path,
+        status: c.res?.status ?? 0,
+        duration_ms: durationMs,
+      };
+      const work = track('api_request', payload);
+      if (c.executionCtx?.waitUntil) {
+        c.executionCtx.waitUntil(work);
+      } else {
+        void work;
+      }
+    } catch (err) {
+      console.error('Vercel analytics track failed:', err?.message || err);
     }
   }
 });

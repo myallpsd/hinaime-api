@@ -332,15 +332,7 @@ const apiDocumentation = {
       hasParams: true,
       hasQueries: false,
       example: '/character/roronoa-zoro-7',
-      description: 'fetches character information based on id.',
-    },
-    {
-      name: 'actor detail',
-      endpoint: '/character/:id',
-      hasParams: true,
-      hasQueries: false,
-      example: '/character/people:kana-hanazawa-1',
-      description: 'fetches actor information based on id.',
+      description: 'fetches character information based on id (accepts prefixed or unprefixed).',
     },
     {
       name: 'actors',
@@ -348,7 +340,7 @@ const apiDocumentation = {
       hasParams: true,
       hasQueries: false,
       example: '/actors/kana-hanazawa-1',
-      description: 'fetches actor information based on id.',
+      description: 'fetches actor information based on id (accepts prefixed or unprefixed).',
     },
     {
       name: 'episodes',
