@@ -132,7 +132,16 @@ app.get('/api', (c) => {
 });
 app.get('/docs', (c) => {
   const url = new URL(c.req.url);
-  const origin = `${url.protocol}//${url.host}`;
+  const forwardedProto = c.req.header('x-forwarded-proto');
+  let protocol = forwardedProto || url.protocol.replace(':', '');
+  const host = c.req.header('x-forwarded-host') || url.host;
+
+  if (!protocol) protocol = 'http';
+  if (!forwardedProto && host.endsWith('vercel.app')) {
+    protocol = 'https';
+  }
+
+  const origin = `${protocol}://${host}`;
   const docs = typeof structuredClone === 'function'
     ? structuredClone(hianimeApiDocs)
     : JSON.parse(JSON.stringify(hianimeApiDocs));
