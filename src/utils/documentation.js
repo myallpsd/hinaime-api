@@ -315,11 +315,23 @@ const apiDocumentation = {
       description: 'fetches characters of anime based on id.',
     },
     {
+      name: 'character list',
+      endpoint: '/character/list/:id',
+      hasParams: true,
+      hasQueries: true,
+      queriesList: ['page'],
+      defaultQueries: {
+        page: 1,
+      },
+      example: '/character/list/one-piece-100?page=1',
+      description: 'fetches characters of anime based on id (alias of /characters/:id).',
+    },
+    {
       name: 'character detail',
       endpoint: '/character/:id',
       hasParams: true,
       hasQueries: false,
-      example: '/character/character:roronoa-zoro-7',
+      example: '/character/roronoa-zoro-7',
       description: 'fetches character information based on id.',
     },
     {
@@ -328,6 +340,14 @@ const apiDocumentation = {
       hasParams: true,
       hasQueries: false,
       example: '/character/people:kana-hanazawa-1',
+      description: 'fetches actor information based on id.',
+    },
+    {
+      name: 'actors',
+      endpoint: '/actors/:id',
+      hasParams: true,
+      hasQueries: false,
+      example: '/actors/kana-hanazawa-1',
       description: 'fetches actor information based on id.',
     },
     {

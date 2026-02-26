@@ -8,6 +8,12 @@ const getEnv = (key, defaultValue = '') => {
   return defaultValue;
 };
 
+const getEnvBool = (key, defaultValue = false) => {
+  const raw = getEnv(key, '');
+  if (raw === '') return defaultValue;
+  return raw.toLowerCase() === 'true';
+};
+
 const config = {
   baseurl: getEnv('HIANIME_BASE_URL', 'https://hianime.to'),
   baseurl_v2: getEnv('HIANIME_BASE_URL_V2', 'https://aniwatchtv.to'),
@@ -18,7 +24,7 @@ const config = {
   apiVersion: 'v1',
 
   documentation: {
-    githubUrl: 'https://github.com/ryanwtf88/hianime-api/blob/main/README.md',
+    githubUrl: 'https://github.com/myallpsd/hinaime-api/blob/main/README.md',
   },
 
   redis: {
@@ -50,6 +56,19 @@ const config = {
   isDevelopment: getEnv('NODE_ENV', '') === 'development',
   // Detect Cloudflare Workers environment via injected global
   isCloudflare: (typeof globalThis !== 'undefined' && typeof globalThis.CLOUDFLARE_ENV !== 'undefined'),
+};
+
+const vercelDetected = getEnv('VERCEL', '') === '1' || getEnv('VERCEL_ENV', '') !== '';
+
+config.vercel = {
+  enabled: vercelDetected,
+  analytics: {
+    enabled: getEnvBool('VERCEL_ANALYTICS_ENABLED', true),
+    serverEvents: getEnvBool('VERCEL_ANALYTICS_SERVER_EVENTS', true),
+  },
+  speedInsights: {
+    enabled: getEnvBool('VERCEL_SPEED_INSIGHTS_ENABLED', true),
+  },
 };
 
 export default config;

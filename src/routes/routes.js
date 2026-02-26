@@ -9,6 +9,7 @@ import searchController from '../controllers/search.controller.js';
 import suggestionController from '../controllers/suggestion.controller.js';
 import charactersController from '../controllers/characters.controller.js';
 import characterDetailConroller from '../controllers/characterDetail.controller.js';
+import actorsController from '../controllers/actors.controller.js';
 import episodesController from '../controllers/episodes.controller.js';
 import serversController from '../controllers/serversController.js';
 import streamController from '../controllers/streamController.js';
@@ -42,7 +43,9 @@ router.get(
 router.get('/filter', handler(filterController));
 router.get('/suggestion', handler(suggestionController));
 router.get('/characters/:id', handler(charactersController));
+router.get('/character/list/:id', handler(charactersController));
 router.get('/character/:id', handler(characterDetailConroller));
+router.get('/actors/:id', handler(actorsController));
 router.get('/episodes/:id', handler(episodesController));
 router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));

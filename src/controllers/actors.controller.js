@@ -3,12 +3,12 @@ import { axiosInstance } from '../services/axiosInstance.js';
 import { NotFoundError, validationError } from '../utils/errors.js';
 import normalizePersonId from '../utils/normalizePersonId.js';
 
-const characterDetailConroller = async (c) => {
+const actorsController = async (c) => {
   const id = c.req.param('id');
 
   if (!id) throw new validationError('id is required');
 
-  const normalizedId = normalizePersonId(id, 'character');
+  const normalizedId = normalizePersonId(id, 'people');
   const result = await axiosInstance(`/${normalizedId.replace(':', '/')}`);
   if (!result.success) {
     throw new validationError('make sure given endpoint is correct');
@@ -20,4 +20,4 @@ const characterDetailConroller = async (c) => {
   return response;
 };
 
-export default characterDetailConroller;
+export default actorsController;

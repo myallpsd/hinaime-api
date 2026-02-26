@@ -8,6 +8,8 @@ import { fail } from './utils/response.js';
 import hianimeApiDocs from './utils/swaggerUi.js';
 import { logger } from 'hono/logger';
 import config from './config/config.js';
+import { injectVercelScripts } from './utils/vercelInsights.js';
+import { track } from '@vercel/analytics/server';
 
 const app = new Hono();
 const origins = config.origin.includes(',')
@@ -25,6 +27,48 @@ app.use(
     credentials: true,
   })
 );
+
+app.use('*', async (c, next) => {
+  const start = Date.now();
+  await next();
+
+  const isVercelEnabled = config.vercel.enabled;
+  const analyticsEnabled = config.vercel.analytics.enabled;
+  const speedInsightsEnabled = config.vercel.speedInsights.enabled;
+  const shouldInject = isVercelEnabled && (analyticsEnabled || speedInsightsEnabled);
+
+  const contentType = c.res.headers.get('content-type') || '';
+  if (shouldInject && contentType.includes('text/html')) {
+    const html = await c.res.text();
+    const injected = injectVercelScripts(html, {
+      analyticsEnabled,
+      speedInsightsEnabled,
+    });
+    const headers = new Headers(c.res.headers);
+    headers.delete('content-length');
+    c.res = new Response(injected, {
+      status: c.res.status,
+      statusText: c.res.statusText,
+      headers,
+    });
+  }
+
+  if (isVercelEnabled && config.vercel.analytics.serverEvents && c.req.path.startsWith('/api')) {
+    const durationMs = Date.now() - start;
+    const payload = {
+      method: c.req.method,
+      path: c.req.path,
+      status: c.res.status,
+      duration_ms: durationMs,
+    };
+    const work = track('api_request', payload);
+    if (c.executionCtx?.waitUntil) {
+      c.executionCtx.waitUntil(work);
+    } else {
+      void work;
+    }
+  }
+});
 
 if (config.rateLimit.enabled && !config.isCloudflare) {
   app.use(
