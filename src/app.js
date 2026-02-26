@@ -54,7 +54,10 @@ app.use('*', async (c, next) => {
   }
 
   if (isVercelEnabled && config.vercel.analytics.serverEvents && c.req.path.startsWith('/api')) {
-    if (typeof c.executionCtx?.waitUntil !== 'function') {
+    const hasExecutionContext =
+      typeof globalThis.ExecutionContext !== 'undefined' &&
+      typeof c.executionCtx?.waitUntil === 'function';
+    if (!hasExecutionContext) {
       return;
     }
     try {

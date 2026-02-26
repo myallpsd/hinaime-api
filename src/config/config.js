@@ -59,12 +59,13 @@ const config = {
 };
 
 const vercelDetected = getEnv('VERCEL', '') === '1' || getEnv('VERCEL_ENV', '') !== '';
+const vercelEdgeDetected = typeof globalThis.ExecutionContext !== 'undefined';
 
 config.vercel = {
   enabled: vercelDetected,
   analytics: {
     enabled: getEnvBool('VERCEL_ANALYTICS_ENABLED', true),
-    serverEvents: getEnvBool('VERCEL_ANALYTICS_SERVER_EVENTS', true),
+    serverEvents: getEnvBool('VERCEL_ANALYTICS_SERVER_EVENTS', vercelEdgeDetected),
   },
   speedInsights: {
     enabled: getEnvBool('VERCEL_SPEED_INSIGHTS_ENABLED', true),
