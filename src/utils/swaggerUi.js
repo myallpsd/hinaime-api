@@ -343,9 +343,26 @@ const hianimeApiDocs = {
         responses: { 200: { description: 'Success' } },
       },
     },
+    '/character/list/{id}': {
+      get: {
+        summary: 'Anime character list (alias of /characters/{id})',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+        ],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
     '/character/{id}': {
       get: {
-        summary: 'Character or actor detail',
+        summary: 'Character detail (prefixed or unprefixed id)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/actors/{id}': {
+      get: {
+        summary: 'Actor detail (prefixed or unprefixed id)',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: { 200: { description: 'Success' } },
       },

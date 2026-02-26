@@ -340,7 +340,7 @@ const apiDocumentation = {
       hasParams: true,
       hasQueries: false,
       example: '/actors/kana-hanazawa-1',
-      description: 'fetches actor information based on id (accepts prefixed or unprefixed).',
+      description: 'fetches actor information based on id (accepts prefixed or unprefixed) given that the id is in the format of name-number (e.g. kana-hanazawa-1).',
     },
     {
       name: 'episodes',

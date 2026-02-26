@@ -54,6 +54,9 @@ app.use('*', async (c, next) => {
   }
 
   if (isVercelEnabled && config.vercel.analytics.serverEvents && c.req.path.startsWith('/api')) {
+    if (typeof c.executionCtx?.waitUntil !== 'function') {
+      return;
+    }
     try {
       const durationMs = Date.now() - start;
       const payload = {
@@ -63,11 +66,7 @@ app.use('*', async (c, next) => {
         duration_ms: durationMs,
       };
       const work = track('api_request', payload);
-      if (c.executionCtx?.waitUntil) {
-        c.executionCtx.waitUntil(work);
-      } else {
-        void work;
-      }
+      c.executionCtx.waitUntil(work);
     } catch (err) {
       console.error('Vercel analytics track failed:', err?.message || err);
     }
