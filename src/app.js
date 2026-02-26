@@ -130,7 +130,15 @@ app.route('/api/v1', hiAnimeRoutes);
 app.get('/api', (c) => {
   return c.redirect('/');
 });
-app.get('/docs', (c) => c.json(hianimeApiDocs));
+app.get('/docs', (c) => {
+  const url = new URL(c.req.url);
+  const origin = `${url.protocol}//${url.host}`;
+  const docs = typeof structuredClone === 'function'
+    ? structuredClone(hianimeApiDocs)
+    : JSON.parse(JSON.stringify(hianimeApiDocs));
+  docs.servers = [{ url: `${origin}/api/${config.apiVersion}` }];
+  return c.json(docs);
+});
 app.get('/', swaggerUI({ url: '/docs' }));
 app.onError((err, c) => {
   if (err instanceof AppError) {
