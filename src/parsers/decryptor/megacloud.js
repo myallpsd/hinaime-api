@@ -20,10 +20,14 @@ async function getDecryptionKey() {
   }
 
   try {
+<<<<<<< HEAD
 
     cachedKey = "3709ad8892f413166b796a10c7fb86018bd1be1c7ae6f4d2cfc3fdc299cb3205";
     keyLastFetched = now;
     console.log('Decryption key fetched and cached');
+=======
+    cachedKey = "3709ad8892f413166b796a10c7fb86018bd1be1c7ae6f4d2cfc3fdc299cb3205";
+>>>>>>> 5165ef348c28babf774763bb50ae70c7ffeb7bdb
     return cachedKey;
   } catch (error) {
     console.error('Failed to fetch decryption key:', error.message);
@@ -32,7 +36,6 @@ async function getDecryptionKey() {
       console.log('Using expired cached key as fallback');
       return cachedKey;
     }
-    throw new Error('Unable to fetch decryption key');
   }
 }
 
